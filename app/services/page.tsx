@@ -1,10 +1,12 @@
+"use client";
+
 export default function Services() {
-    return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
-        <div>
-          <h1 style={{ fontSize: "2rem", fontWeight: "bold" }}>Services</h1>
-          <p>This is the services page.</p>
-        </div>
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <div>
+        <h1 className="text-3xl font-bold">Services</h1>
+        <p>This is the services page.</p>
       </div>
-    );
-  }
+    </div>
+  );
+}

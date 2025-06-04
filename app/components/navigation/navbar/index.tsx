@@ -2,29 +2,28 @@
 import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button} from "@heroui/react";
 import Logo from "@/app/components/navbar/Logo";
 
-
 export default function App() {
   return (
-    <Navbar>
+    <Navbar className="bg-black shadow-md" aria-label="Main Navigation">
       <NavbarBrand>
-      <Link href="/">
-        <Logo />
-      </Link>
+        <Link href="/">
+          <Logo />
+        </Link>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-      <NavbarItem>
-        <Link color="foreground" href="/about">
-          About
-        </Link>
-      </NavbarItem>
+        <NavbarItem>
+          <Link color="foreground" href="/about">
+            About
+          </Link>
+        </NavbarItem>
         <NavbarItem isActive>
           <Link aria-current="page" href="/services">
-          Services
+            Services
           </Link>
         </NavbarItem>
         <NavbarItem>
           <Link color="foreground" href="/contact">
-          Contact
+            Contact
           </Link>
         </NavbarItem>
       </NavbarContent>
@@ -33,7 +32,7 @@ export default function App() {
           <Link href="#">Login</Link>
         </NavbarItem>
         <NavbarItem>
-          <Button as={Link} color="primary" href="#" variant="flat">
+          <Button as={Link} href="/signup" className="bg-blue-600 hover:bg-blue-700">
             Sign Up
           </Button>
         </NavbarItem>
