@@ -1,10 +1,10 @@
-// carlnorwood12/nextjs-example/nextjs-example-c7dd447be2ff71ecb1b827933cb522f7b13516bb/app/admin/registration/page.tsx
-"use client"; // Keep this for client-side interactions
+// carlnorwood12/nextjs-example/nextjs-example-fb5b97f414ef93be4eacec71d4f06541945c96d9/app/admin/registration/page.tsx
+"use client";
 
 import { Button, Form, Input, Link } from "@heroui/react";
 import React, { useState } from "react";
-import { createClient } from "@/utils/supabase/client"; // Import Supabase client
-import { useRouter } from "next/navigation"; // For redirection
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 export default function RegistrationPage() {
   const router = useRouter();
@@ -26,8 +26,7 @@ export default function RegistrationPage() {
       setError("Passwords do not match.");
       return;
     }
-
-    const { data, error: signUpError } = await supabase.auth.signUp({
+    const { data: signUpResponse, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -41,25 +40,52 @@ export default function RegistrationPage() {
     if (signUpError) {
       setError(signUpError.message);
       console.error("Registration error:", signUpError);
-    } else if (data.user) {
-      // Check if the user object exists and if email confirmation is required
-      if (data.user.identities && data.user.identities.length > 0 && !data.user.email_confirmed_at) {
-        setMessage(
-          "Registration successful! Please check your email to confirm your account."
+      return;
+    }
+
+    const user = signUpResponse.user;
+
+    if (user) {
+      const fullName = `${firstName} ${lastName}`.trim();
+      const { error: profileInsertError } = await supabase
+        .from('profiles') // YOUR CUSTOM TABLE NAME HERE
+        .insert({
+          id: user.id,      
+          name: fullName,
+          email: user.email,
+          role: 'admin'    
+        });
+
+      if (profileInsertError) {
+        setError(
+          `User registered in Auth, but failed to create profile with admin role: ${profileInsertError.message}. Please contact support.`
         );
+        console.error("Profile insert error:", profileInsertError);
+        // Note: The user exists in auth.users, but their profile/role setup failed.
+        // You might need a cleanup mechanism or manual intervention for such cases.
       } else {
-        setMessage("Registration successful! You can now log in.");
+        // Profile created successfully
+        if (user.identities && user.identities.length > 0 && !user.email_confirmed_at) {
+          setMessage(
+            "Registration successful! Admin profile created. Please check your email to confirm your account."
+          );
+        } else {
+          setMessage("Registration successful! Admin profile created. You can now log in.");
+        }
       }
-      // Optionally redirect to login or a specific page
-      // router.push('/admin/login');
     } else {
-       setError("An unexpected error occurred during registration.");
+      if (signUpResponse.session && !signUpResponse.user) {
+          setMessage("Confirmation email resent. Please check your email. If already confirmed, try logging in.");
+      } else {
+        setError("Registration did not complete fully. User data for profile creation was not available. Please try again or contact support.");
+        console.warn("Registration: signUpResponse.user was null, but no signUpError. Response:", signUpResponse);
+      }
     }
   };
 
   return (
-    <div className="bg-default-50 flex min-h-screen items-center justify-center p-4">
-      <div className="bg-content1 flex w-full max-w-md flex-col gap-4 rounded-lg p-6 shadow-md">
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <div className="flex w-full max-w-md flex-col gap-4 rounded-lg p-6">
         <h2 className="text-xl font-medium">Create an Admin Account</h2>
         {error && <p className="text-sm text-red-500">{error}</p>}
         {message && <p className="text-sm text-green-500">{message}</p>}

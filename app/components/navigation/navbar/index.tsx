@@ -37,12 +37,12 @@ export default function App() {
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem className="hidden lg:flex">
-          <Link href="/login" className="text-gray-500 hover:text-white">
+          <Link href="/admin/login" className="text-gray-500 hover:text-white">
             Login
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Button as={Link} href="/registration" className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button as={Link} href="/admin/registration" className="bg-blue-600 hover:bg-blue-700 text-white">
             Sign Up
           </Button>
         </NavbarItem>

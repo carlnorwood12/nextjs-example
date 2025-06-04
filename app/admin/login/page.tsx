@@ -1,10 +1,10 @@
 // carlnorwood12/nextjs-example/nextjs-example-c7dd447be2ff71ecb1b827933cb522f7b13516bb/app/admin/login/page.tsx
-"use client"; // Keep this for client-side interactions
+"use client";
 
 import { Button, Form, Input, Link } from "@heroui/react";
 import React, { useState } from "react";
-import { createClient } from "@/utils/supabase/client"; // Import Supabase client
-import { useRouter } from "next/navigation"; // For redirection
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function LoginPage() {
     event.preventDefault();
     setError(null);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -25,19 +25,38 @@ export default function LoginPage() {
     if (signInError) {
       setError(signInError.message);
       console.error("Login error:", signInError);
+      return;
+    }
+    if (signInData.user) {
+      const user = signInData.user;
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles') 
+        .select('role')
+        .eq('id', user.id) 
+        .single();
+
+      if (profileError) {
+        setError("Failed to retrieve user role. Please try again.");
+        console.error("Profile fetch error:", profileError);
+        await supabase.auth.signOut();
+        return;
+      }
+
+      if (profileData && profileData.role === 'admin') {
+        router.push("/admin");
+        router.refresh();
+      } else {
+        setError("You do not have permission to access the admin area.");
+        await supabase.auth.signOut();
+      }
     } else {
-      // On successful login, Supabase handles the session.
-      // The middleware will manage redirection to protected routes.
-      // We might want to refresh the page or navigate to ensure middleware kicks in
-      // or to trigger a state update in a layout component.
-      router.push("/admin"); // Redirect to the main admin page or dashboard
-      router.refresh(); // Important to re-evaluate routes and middleware
+      setError("Login successful, but user data could not be retrieved.");
     }
   };
 
   return (
-    <div className="bg-default-50 flex min-h-screen items-center justify-center p-4">
-      <div className="bg-content1 flex w-full max-w-sm flex-col gap-4 rounded-lg p-6 shadow-md">
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <div className="flex w-full max-w-sm flex-col gap-4 rounded-lg p-6">
         <h2 className="text-xl font-medium">Welcome Back, Admin</h2>
         {error && <p className="text-sm text-red-500">{error}</p>}
         <Form className="flex flex-col gap-3" onSubmit={handleSubmit}>
@@ -47,7 +66,6 @@ export default function LoginPage() {
             name="email"
             placeholder="Enter your email"
             type="email"
-            variant="bordered"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -57,7 +75,6 @@ export default function LoginPage() {
             name="password"
             placeholder="Enter your password"
             type="password"
-            variant="bordered"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
