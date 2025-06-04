@@ -1,10 +1,10 @@
 export default function About() {
-    return (
+  return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
       <div>
-        <div>
-          <h1>About</h1>
-          <p>This is the about page. </p>
-        </div>
+        <h1 style={{ fontSize: "2rem", fontWeight: "bold" }}>About</h1>
+        <p>This is the about page.</p>
       </div>
-    );
-  }
+    </div>
+  );
+}
