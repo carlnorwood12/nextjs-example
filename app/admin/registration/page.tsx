@@ -1,4 +1,3 @@
-// app/admin/registration/page.tsx
 "use client";
 
 import { Button, Form, Input, Link } from "@heroui/react";

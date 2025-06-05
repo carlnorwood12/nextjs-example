@@ -13,6 +13,7 @@ export default async function Edit() {
     return redirect('/admin/login');
   }
 
+  // Fetch user profile including role that i included in the database 
   const { data: userProfile, error } = await supabase
     .from('user')
     .select('role')
