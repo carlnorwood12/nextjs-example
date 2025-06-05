@@ -1,5 +1,7 @@
-// carlnorwood12/nextjs-example/nextjs-example-c7dd447be2ff71ecb1b827933cb522f7b13516bb/app/admin/login/page.tsx
 "use client";
+
+  // to test the login page with admin cred, you can use the following credentials: 
+  // drbubblesgradedunit@gmail.com and password: Password!A
 
 import { Button, Form, Input, Link } from "@heroui/react";
 import React, { useState } from "react";
@@ -13,40 +15,37 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => 
+{
     event.preventDefault();
     setError(null);
-
+    // From documentation supabase
     const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-
+    // if theres an error output
     if (signInError) {
       setError(signInError.message);
       console.error("Login error:", signInError);
       return;
     }
-    if (signInData.user) {
+    // if theres no error, check if the user is an admin
+    if (signInData.user) 
+    {
       const user = signInData.user;
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles') 
+      const { data: profileData } = await supabase
+        .from('user')
         .select('role')
-        .eq('id', user.id) 
+        .eq('id', user.id)
         .single();
-
-      if (profileError) {
-        setError("Failed to retrieve user role. Please try again.");
-        console.error("Profile fetch error:", profileError);
-        await supabase.auth.signOut();
-        return;
-      }
-
       if (profileData && profileData.role === 'admin') {
         router.push("/admin");
         router.refresh();
-      } else {
-        setError("You do not have permission to access the admin area.");
+      } 
+      else 
+      {
+        setError("Sorry, you do not have admin access.");
         await supabase.auth.signOut();
       }
     } else {
@@ -78,14 +77,14 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Button className="w-full" type="submit">
+          <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" type="submit">
             Sign In
           </Button>
         </Form>
-        <p className="text-small text-center">
+        <p className="text-small text-center text-gray-500">
           Need an account?{" "}
           <Link href="/admin/registration" size="sm">
-            Sign Up
+            Create one
           </Link>
         </p>
       </div>

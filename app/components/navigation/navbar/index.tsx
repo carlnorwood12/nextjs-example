@@ -42,13 +42,26 @@ export default function App() {
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Button as={Link} href="/admin/registration" className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button as={Link} href="/admin/registration" className="text-indigo-600 hover:text-indigo-700">
             Sign Up
           </Button>
         </NavbarItem>
-        <NavbarItem className="hidden lg:flex">
-          <Link href="/admin" className="text-gray-500 hover:text-white">
-            Admin
+        <NavbarItem>
+          <Link
+            href="/"
+            className="text-red-600 hover:text-red-700"
+            onClick={async (e) => {
+              e.preventDefault(); // Prevent navigation
+              const { error } = await supabase.auth.signOut();
+              if (error) {
+                console.error("Error logging out:", error.message);
+              } else {
+                // Redirect to the home page or login page after logout
+                window.location.href = "/";
+              }
+            }}
+          >
+            Logout
           </Link>
         </NavbarItem>
       </NavbarContent>
