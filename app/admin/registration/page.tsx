@@ -15,11 +15,11 @@ export default function RegistrationPage() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
+  // handleSubmit function to handle the registration process
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
     setMessage(null);
-
     const { data: signUpResponse, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
@@ -30,7 +30,7 @@ export default function RegistrationPage() {
         },
       },
     });
-
+    // if there are any errors during sign up, handle them
     if (signUpError) {
       console.error("Registration error:", signUpError);
       if (signUpError instanceof AuthError) {
@@ -44,25 +44,19 @@ export default function RegistrationPage() {
           setError(signUpError.message); // Default Supabase error message
         }
       } else {
-        setError("An unexpected error occurred. Please try again."); // Generic fallback
+        setError("An unexpected error occurred. Please try again."); // else fallback error message
       }
       return;
     }
-
+    // If signUpResponse contains user data or session, set the appropriate message
     if (signUpResponse.user) {
-      if (!signUpResponse.user.email_confirmed_at) {
-        setMessage("Registration successful! Your profile is being created. Please check your email to confirm your account.");
-      } else {
-        setMessage("Confirmed email!");
-      }
-    } else if (signUpResponse.session && !signUpResponse.user) {
-      setMessage("Confirmation email sent (or resent). Please check your email to complete registration. If already confirmed, try logging in.");
-    } else {
-      setError("Registration attempt finished. User data not immediately available. Please check your email or try logging in. If issues persist, contact support.");
-      console.warn("Registration: signUpResponse.user was null or no session, and no signUpError. Response:", signUpResponse);
+        setMessage("Success! Please check your email to confirm your account.");
+    }
+    else
+    {
+        setError("Something went wrong during registration. Please try again.");
     }
   };
-
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <div className="flex w-full max-w-md flex-col gap-4 rounded-lg p-6 shadow-lg dark:bg-gray-800">

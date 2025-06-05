@@ -2,7 +2,8 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 
-// here we 
+// here we create a supabase client for server-side rendering 
+// // this is used in the admin panel to check if the user is logged in
 export async function createClient() {
   const cookieStore = await cookies()
 

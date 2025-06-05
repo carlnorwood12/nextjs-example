@@ -40,7 +40,7 @@ export default function LoginPage() {
         .eq('id', user.id)
         .single();
       if (profileData && profileData.role === 'admin') {
-        router.push("/admin");
+        router.push("/admin"); // Redirect to admin page
         router.refresh();
       } 
       else 

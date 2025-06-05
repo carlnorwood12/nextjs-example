@@ -2,9 +2,25 @@
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button } from "@heroui/react";
 import Logo from "@/app/components/navbar/Logo";
 import { usePathname } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 export default function App() {
   const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClient();
+
+  // Function to handle logout
+  const handleLogout = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error logging out:", error.message);
+    } else {
+      router.push('/'); // Redirect to home page after logout
+      router.refresh();
+    }
+  };
 
   return (
     <Navbar className="bg-black shadow-md" aria-label="Main Navigation">
@@ -50,16 +66,7 @@ export default function App() {
           <Link
             href="/"
             className="text-red-600 hover:text-red-700"
-            onClick={async (e) => {
-              e.preventDefault(); // Prevent navigation
-              const { error } = await supabase.auth.signOut();
-              if (error) {
-                console.error("Error logging out:", error.message);
-              } else {
-                // Redirect to the home page or login page after logout
-                window.location.href = "/";
-              }
-            }}
+            onClick={handleLogout}
           >
             Logout
           </Link>

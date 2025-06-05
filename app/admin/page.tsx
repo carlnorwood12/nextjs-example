@@ -18,28 +18,25 @@ export default async function Page() {
     data: { session },
   } = await supabase.auth.getSession();
 
-  // Check if the session exists and redirect if not
+  // Check if the session exists and redirect to login if not
   if (!session) {
     return redirect("/admin/login");
   }
-
   // Fetch user profile including role, first_name, and last_name
   const { data: userProfile, error: profileError } = await supabase.from("user").select("role, first_name, last_name").eq("id", session.user.id).single();
-
   if (profileError || !userProfile) {
-    console.error("Error fetching user profile or profile not found:", profileError);
-    return redirect("/"); // Redirect to home or an error page if profile issues
+    console.error("Error fetching user profile or profile not found:", profileError); // output error to console
+    return redirect("/"); // Redirect to home 
   }
-
   // Authorization: check if the user is an admin
   if (userProfile.role !== "admin") {
-    return redirect("/"); // Redirect non-admins
+    return redirect("/"); // Redirect to home
   }
-
-  // Construct a display name
+  // Combine first_name and last_name for display so its like welcome, Carl Norwood
   const { first_name, last_name } = userProfile;
   let displayName = ""; // Initialize with an empty string
 
+  // Check if first_name and last_name exist and combine them
   if (first_name && last_name) {
     displayName = `${first_name} ${last_name}`;
   } else if (first_name) {

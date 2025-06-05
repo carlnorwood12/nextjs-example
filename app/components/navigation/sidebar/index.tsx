@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+// simple protected page: edit in the sidebar for admins only
 const Sidebar = () => {
   return (
     <div className="w-64 bg-black text-white min-h-screen p-4">
